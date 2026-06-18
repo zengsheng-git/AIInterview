@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { SplitLayout } from '@/components/layout/SplitLayout'
 import { MessageList } from '@/components/chat/MessageList'
 import { InputBar } from '@/components/chat/InputBar'
+import { ReferencePanel } from '@/components/reference/ReferencePanel'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { RadarChart } from '@/components/radar/RadarChart'
@@ -258,6 +259,12 @@ export function InterviewPage() {
         <SplitLayout
           left={
             <div className="flex flex-col h-full bg-white relative">
+              {/* ⭐ 浮动"参考资料"按钮 + 抽屉（重看 JD / 简历） */}
+              <ReferencePanel
+                jdTitle={session.jdTitle}
+                jdRawText={session.jdRawText}
+                resumeRawText={session.resumeRawText}
+              />
               <MessageList />
               {status === 'running' && (
                 <InputBar

@@ -93,9 +93,11 @@ export class InterviewService {
 
     // 加载简历（如果提供）→ 调 LLM 预处理成结构化数据
     let resumeContext = ''
+    let resumeRawText = ''
     if (params.resumeId) {
       const resume = await this.prisma.resume.findUnique({ where: { id: params.resumeId } })
       if (resume?.rawText) {
+        resumeRawText = resume.rawText
         this.logger.log(`📋 预处理简历（${resume.rawText.length} 字符）...`)
         const structured = await parseResume(this.llm, resume.rawText)
         resumeContext = formatStructuredResumeForPrompt(structured)
@@ -166,6 +168,8 @@ export class InterviewService {
       sessionId: session.id,
       mode: session.mode,
       jdTitle: jd.title,
+      jdRawText: jd.rawText,                // ⭐ 原始 JD 文本（前端可显示）
+      resumeRawText,                        // ⭐ 简历原文（前端可显示）
       firstQuestion: first.question,
       currentSkill: firstSkill,
       currentType: firstType,

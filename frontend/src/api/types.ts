@@ -58,6 +58,8 @@ export type InterviewStartResult = {
   skillsToCover: string[]
   totalQuestions?: number
   questionIndex?: number
+  jdRawText?: string         // ⭐ 原始 JD 全文（用于"重看 JD"抽屉）
+  resumeRawText?: string     // ⭐ 简历全文（用于"重看简历"抽屉）
 }
 
 export type InterviewChatResult = {
