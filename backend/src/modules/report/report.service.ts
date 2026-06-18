@@ -8,6 +8,7 @@ import {
   type ReportContext,
   type QaItem,
 } from './export.util'
+import { generateWordReport } from './word-export.util'
 
 @Injectable()
 export class ReportService {
@@ -35,6 +36,26 @@ export class ReportService {
       filename: `面试报告_${safeTitle}_${date}.md`,
       content,
       mimeType: 'text/markdown',
+    }
+  }
+
+  /**
+   * 导出 Word 文档报告（含参考答案、专业排版）
+   */
+  async exportWord(sessionId: string): Promise<{
+    filename: string
+    content: Buffer
+    mimeType: string
+  }> {
+    const ctx = await this.buildReportContext(sessionId)
+    const buffer = await generateWordReport(ctx)
+    const safeTitle = ctx.jdTitle.replace(/[\\/:*?"<>|]/g, '_')
+    const date = new Date().toISOString().slice(0, 10)
+    this.logger.log(`Word 报告生成完成 session=${sessionId} size=${buffer.length} bytes`)
+    return {
+      filename: `面试报告_${safeTitle}_${date}.docx`,
+      content: buffer,
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     }
   }
 

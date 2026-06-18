@@ -34,6 +34,7 @@ export function HistoryDetailPage() {
   const [data, setData] = useState<HistoryDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [exporting, setExporting] = useState(false)
+  const [exportingWord, setExportingWord] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -54,6 +55,18 @@ export function HistoryDetailPage() {
       alert(`导出失败：${e.message}`)
     } finally {
       setExporting(false)
+    }
+  }
+
+  const handleExportWord = async () => {
+    if (!id) return
+    setExportingWord(true)
+    try {
+      await reportApi.exportWord(id)
+    } catch (e: any) {
+      alert(`导出 Word 失败：${e.message}`)
+    } finally {
+      setExportingWord(false)
     }
   }
 
@@ -94,15 +107,26 @@ export function HistoryDetailPage() {
               <ArrowLeft className="w-4 h-4" />
               返回历史
             </Button>
-            <Button
-              onClick={handleExport}
-              loading={exporting}
-              variant="gradient"
-              size="sm"
-            >
-              <FileDown className="w-4 h-4" />
-              导出 Markdown
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleExportWord}
+                loading={exportingWord}
+                variant="gradient"
+                size="sm"
+              >
+                <FileDown className="w-4 h-4" />
+                导出 Word
+              </Button>
+              <Button
+                onClick={handleExport}
+                loading={exporting}
+                variant="secondary"
+                size="sm"
+              >
+                <FileDown className="w-4 h-4" />
+                导出 Markdown
+              </Button>
+            </div>
           </div>
 
           <div className="flex items-center gap-3 mb-2">

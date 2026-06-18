@@ -193,6 +193,19 @@ export function InterviewPage() {
     }
   }
 
+  const [exportingWord, setExportingWord] = useState(false)
+  const handleExportWord = async () => {
+    if (!session) return
+    setExportingWord(true)
+    try {
+      await reportApi.exportWord(session.sessionId)
+    } catch (e: any) {
+      alert(`导出 Word 失败：${e.message}`)
+    } finally {
+      setExportingWord(false)
+    }
+  }
+
   const mode = session.mode
   const modeIcon = {
     quick: <Zap className="w-3 h-3" />,
@@ -356,16 +369,28 @@ export function InterviewPage() {
                     icon={<Award className="w-4 h-4" />}
                     variant="gradient"
                     extra={
-                      <Button
-                        onClick={handleExportMd}
-                        loading={exportingMd}
-                        variant="gradient"
-                        size="sm"
-                        title="导出 Markdown 报告（含每题参考答案）"
-                      >
-                        <FileDown className="w-3.5 h-3.5" />
-                        导出报告
-                      </Button>
+                      <div className="flex gap-1.5">
+                        <Button
+                          onClick={handleExportWord}
+                          loading={exportingWord}
+                          variant="gradient"
+                          size="sm"
+                          title="导出 Word 文档（含每题参考答案、专业排版）"
+                        >
+                          <FileDown className="w-3.5 h-3.5" />
+                          Word
+                        </Button>
+                        <Button
+                          onClick={handleExportMd}
+                          loading={exportingMd}
+                          variant="secondary"
+                          size="sm"
+                          title="导出 Markdown 报告"
+                        >
+                          <FileDown className="w-3.5 h-3.5" />
+                          MD
+                        </Button>
+                      </div>
                     }
                   >
                     <RadarChart scores={report.radar} />

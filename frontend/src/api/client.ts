@@ -174,6 +174,11 @@ export const reportApi = {
       `${import.meta.env.VITE_API_BASE_URL || '/api'}/report/${sessionId}/markdown`,
       `面试报告.md`,
     ),
+  exportWord: (sessionId: string) =>
+    downloadFromApi(
+      `${import.meta.env.VITE_API_BASE_URL || '/api'}/report/${sessionId}/word`,
+      `面试报告.docx`,
+    ),
 }
 
 // ============ History ============

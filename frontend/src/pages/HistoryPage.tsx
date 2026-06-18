@@ -76,6 +76,18 @@ export function HistoryPage() {
     }
   }
 
+  const handleExportWord = async (id: string) => {
+    setExportingId(id)
+    try {
+      const { reportApi } = await import('@/api/client')
+      await reportApi.exportWord(id)
+    } catch (e: any) {
+      alert(`导出 Word 失败：${e.message}`)
+    } finally {
+      setExportingId(null)
+    }
+  }
+
   const handleDelete = async () => {
     if (!confirmDelete) return
     setDeletingId(confirmDelete.id)
@@ -364,16 +376,30 @@ export function HistoryPage() {
                           <Button
                             onClick={(e) => {
                               e.stopPropagation()
+                              handleExportWord(item.id)
+                            }}
+                            variant="secondary"
+                            size="sm"
+                            loading={exportingId === item.id}
+                            disabled={item.status !== 'completed'}
+                            title={item.status !== 'completed' ? '面试未完成，无法导出' : '导出 Word 文档（含参考答案）'}
+                          >
+                            <FileDown className="w-3.5 h-3.5" />
+                            Word
+                          </Button>
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation()
                               handleExport(item.id)
                             }}
                             variant="ghost"
                             size="sm"
                             loading={exportingId === item.id}
                             disabled={item.status !== 'completed'}
-                            title={item.status !== 'completed' ? '面试未完成，无法导出' : ''}
+                            title={item.status !== 'completed' ? '面试未完成，无法导出' : '导出 Markdown 报告'}
                           >
                             <FileDown className="w-3.5 h-3.5" />
-                            报告
+                            MD
                           </Button>
                           <Button
                             onClick={(e) => {
