@@ -5,10 +5,24 @@ build/
 .env.local
 *.log
 .DS_Store
+nul
+
+# 数据库
 data/dev.db
 data/dev.db-journal
 prisma/dev.db
 prisma/dev.db-journal
+backend/data/app.db
+backend/data/app.db-journal
+
+# 调试临时文件
+data/
+data/*.txt
+data/*.json
+data/*.csv
+data/*.md
+
+# IDE
 coverage/
 .vscode/
 .idea/

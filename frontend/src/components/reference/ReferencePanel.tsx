@@ -19,11 +19,11 @@ export function ReferencePanel({ jdTitle, jdRawText, resumeRawText }: Props) {
   const [open, setOpen] = useState(false)
   const [tab, setTab] = useState<'jd' | 'resume'>('jd')
 
-  // 没有 JD 也没有简历 → 不显示按钮
-  if (!jdRawText && !resumeRawText) return null
-
-  // 默认 Tab：有简历显示简历，否则显示 JD
+  // 没有 JD 也没有简历 → 不渲染任何东西（hooks 已在上面声明，安全）
+  const hasContent = !!(jdRawText || resumeRawText)
   const activeTab = tab === 'resume' && resumeRawText ? 'resume' : 'jd'
+
+  if (!hasContent) return null
 
   return (
     <>
@@ -66,7 +66,7 @@ export function ReferencePanel({ jdTitle, jdRawText, resumeRawText }: Props) {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 z-50 bg-white shadow-elevated w-full max-w-md flex flex-col"
+              className="fixed top-0 right-0 bottom-0 left-auto z-50 bg-white shadow-elevated w-full max-w-md flex flex-col"
             >
               {/* 抽屉头部 */}
               <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-indigo-50 to-purple-50">
