@@ -1,0 +1,95 @@
+// Prisma Schema - AI 模拟面试系统
+// 数据库：SQLite (单文件: data/app.db)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============ 业务模型 ============
+
+/// JD 岗位描述
+model JobDescription {
+  id          String   @id @default(cuid())
+  title       String
+  rawText     String   // 原始 JD 文本
+  skills      String   // JSON: 技能点列表
+  focusAreas  String   // JSON: 考察重点
+  parsedAt    DateTime @default(now())
+
+  sessions    InterviewSession[]
+}
+
+/// 简历
+model Resume {
+  id          String   @id @default(cuid())
+  filename    String
+  rawText     String   // 提取的纯文本（脱敏后）
+  meta        String   // JSON: 解析出的结构化信息
+  uploadedAt  DateTime @default(now())
+
+  sessions    InterviewSession[]
+}
+
+/// 模拟面试会话
+model InterviewSession {
+  id           String   @id @default(cuid())
+  jdId         String
+  resumeId     String?
+  mode         String   // 'practice' | 'strict'
+  status       String   @default("active") // 'active' | 'completed' | 'aborted'
+  config       String   // JSON: 面试配置（技能点列表等）
+
+  startedAt    DateTime @default(now())
+  endedAt      DateTime?
+
+  jd           JobDescription @relation(fields: [jdId], references: [id])
+  resume       Resume?        @relation(fields: [resumeId], references: [id])
+
+  messages     ChatMessage[]
+  report       InterviewReport?
+}
+
+/// 聊天消息
+model ChatMessage {
+  id         String   @id @default(cuid())
+  sessionId  String
+  role       String   // 'interviewer' | 'candidate' | 'system'
+  content    String   // 消息内容
+  meta       String?  // JSON: 追问层级、技能点等
+  createdAt  DateTime @default(now())
+
+  session    InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+}
+
+/// 面试评估报告
+model InterviewReport {
+  id         String   @id @default(cuid())
+  sessionId  String   @unique
+  scores     String   // JSON: {基础, 项目, 系统设计, 沟通}
+  summary    String   // 文字总结
+  suggestions String  // JSON: 改进建议列表
+  profile    String?  // JSON: 候选人画像（HR 视角）
+  createdAt  DateTime @default(now())
+
+  session    InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+/// LLM 调用日志（审计用）
+model LlmCallLog {
+  id         String   @id @default(cuid())
+  task       String   // 'jd_parse' | 'resume_match' | 'interview' | 'score'
+  model      String
+  promptTokens Int?
+  completionTokens Int?
+  duration   Int      // ms
+  success    Boolean
+  errorMsg   String?
+  createdAt  DateTime @default(now())
+}
